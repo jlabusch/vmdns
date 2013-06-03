@@ -1,0 +1,22 @@
+--- node_modules/mdns/lib/resolver_sequence_tasks.js	2012-12-20 05:52:13.000000000 +1300
++++ node_modules/mdns/lib/resolver_sequence_tasks.js	2013-06-03 19:13:13.357724351 +1200
+@@ -106,16 +106,16 @@
+   _getaddrinfo = function getaddrinfo_v06x(host, family, cb) {
+     var wrap = cares.getaddrinfo(host, family);
+     if ( ! wrap) {
+-      throw errnoException(errno, 'getaddrinfo');
++      throw errnoException(process._errno, 'getaddrinfo');
+     }
+     wrap.oncomplete = function(addresses) {
+ 
+       if (addresses) {
+         cb(undefined, addresses);
+-      } else if (errno === 'ENOENT') {
++      } else if (process._errno === 'ENOENT') {
+         cb(undefined, []);
+       } else {
+-        cb(errnoException(errno, 'getaddrinfo'));
++        cb(errnoException(process._errno, 'getaddrinfo'));
+       }
+     }
+   };
