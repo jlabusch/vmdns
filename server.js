@@ -48,9 +48,7 @@ browser.on(
             if (vms[ips[0]]){
                 // Already seen, not interesting
             }else{
-                vms[ips[0]] = {
-                    addr: ips
-                }
+                vms[ips[0]] = {};
                 console.log('up: ' + ips[0]);
                 http.get({host: ips[0], port: 9301, path: '/'}, query_handler(ips)).on('error', function(e){
                     console.log('Error querying metadata from http://' + ips[0] + ':9301 [[' + e.message + ']]');
