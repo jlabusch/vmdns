@@ -20,7 +20,7 @@ Starts a zeroconf client that registers a VM with the name "Fred".
 ## Example
 
 <pre>
-curl http://localhost:9300/ -o - 2&gt;/dev/null | python -mjson.tool 
+$ curl http://localhost:9300/ -o - 2&gt;/dev/null | python -mjson.tool 
 {
     "10.1.1.4": {
         "name": "Fred"
