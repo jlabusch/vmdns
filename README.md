@@ -1,9 +1,22 @@
-This is the seed of an idea for managing the various VMs I have on my
-home and work computers. Because their networks are always changing and
-I don't necessarily have control of things like DNS, I need another kind
-of service discovery method.
+# What teh
 
-Needs more work; what's holding it up right now is that I haven't got
-TXT records working yet.
+I have many VMs that move around between hosts and even between networks. I can't keep track of them!
+(Well I can, but it's harder than it should be.)
 
-Prereqs: libavahi-compat-libdnssd-dev
+## Server
+
+> `node ./server.js`
+
+Starts a zeroconf server to track my VMs.
+
+Query it at http://localhost:9300/ to get a JSON dump of hosts we know about.
+
+## Client
+
+> `node ./client.js --name "Fred"`
+
+Starts a zeroconf client that registers a VM with the name "Fred".
+
+## Dependencies
+
+libavahi-compat-libdnssd-dev
