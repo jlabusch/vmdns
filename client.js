@@ -8,7 +8,7 @@ var parser = new getopt.BasicParser('n:(name)h(help)', process.argv);
 var option;
 var config = {};
 
-function usage(m){
+function usage(){
     console.log('Options: --name <name>');
     process.exit(1);
 }
