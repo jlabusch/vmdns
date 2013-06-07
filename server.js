@@ -2,6 +2,7 @@ var mdns    = require('mdns'),
     http    = require('http'),
     express = require('express'),
     getopt  = require('posix-getopt'),
+    util    = require('./util.js'),
     _       = require('underscore')._;
 
 var vms = {
@@ -49,12 +50,12 @@ var vms = {
                     port: parts.length > 1 ? parts[1] : 9300,
                     path: '/'
                 },
-                query_handler(
+                util.query_handler(
                     function(s){
                         var p = JSON.parse(s);
                         var v = {};
                         _.each(p, function(val, key){
-                            if (key.match(/^\d+\.\d+\.\d+\.\d+$/)){
+                            if (util.is_ip(key)){
                                 v[key] = val;
                             }
                         });
@@ -115,7 +116,7 @@ var vms = {
             console.log('add: ' + ips[0]);
             http.get(
                 {host: ips[0], port: 9301, path: '/'},
-                query_handler(
+                util.query_handler(
                     function(s){
                         _.extend(vms[ips[0]], JSON.parse(s));
                     }
@@ -148,20 +149,4 @@ var vms = {
 
     browser.start();
 })();
-
-function query_handler(func){
-    return function(resp){
-        var str = '';
-        resp.on('data', function(chunk){
-            str += chunk;
-        });
-        resp.on('end', function(){
-            try{
-                func(str);
-            }catch(ex){
-                console.log('Exception processing query response [[' + ex + ']]');
-            }
-        });
-    };
-}
 
