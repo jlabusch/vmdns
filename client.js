@@ -6,11 +6,11 @@ var mdns    = require('mdns'),
 var vm = {};
 
 (function(){
-    var parser = new getopt.BasicParser('n:(name)h(help)', process.argv);
+    var parser = new getopt.BasicParser('n:(name)d:(desc)h(help)', process.argv);
     var option;
 
     function usage(){
-        console.log('Options: --name <name>');
+        console.log('Options: [--name <name>] [--desc <description>]');
         process.exit(1);
     }
 
@@ -21,6 +21,9 @@ var vm = {};
                 break;
             case 'n':
                 vm.name = option.optarg;
+                break;
+            case 'd':
+                vm.desc = option.optarg;
                 break;
         }
     }
