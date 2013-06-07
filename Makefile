@@ -1,12 +1,15 @@
-.PHONY: dep clean install
+.PHONY: dep clean tidy client-install server-install client-uninstall server-uninstall
 
 dep: package.json
 	rm -fr node_modules
 	npm install -d
 	patch -p0 < mdns.patch
 
-clean:
-	rm -fr node_modules *.log vms vm-announce.conf
+tidy:
+	rm -fr *.log vms vm-announce-client.conf vm-announce-server.conf
+
+clean: tidy
+	rm -fr node_modules
 
 vm-announce-client.conf: client.conf
 	sed 's!PLACE!'$$PWD'!' $< | sed 's/HOST/$(shell /bin/hostname)/' > $@
