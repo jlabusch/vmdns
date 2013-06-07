@@ -8,22 +8,6 @@ var vms = {
     peers: {}
 };
 
-function query_handler(func){
-    return function(resp){
-        var str = '';
-        resp.on('data', function(chunk){
-            str += chunk;
-        });
-        resp.on('end', function(){
-            try{
-                func(str);
-            }catch(ex){
-                console.log('Exception processing query response [[' + ex + ']]');
-            }
-        });
-    };
-}
-
 // Options and peers
 (function(){
     var parser = new getopt.BasicParser('p:(peers)h(help)', process.argv);
@@ -54,7 +38,7 @@ function query_handler(func){
     }
 
     function poll_peers(){
-        console.log(JSON.stringify(vms));
+        //console.log(JSON.stringify(vms));
         // These GETs happen in parallel
         _.each(vms.peers, function(vmlist, peer){
             //console.log('checking peer: ' + peer);
@@ -164,4 +148,20 @@ function query_handler(func){
 
     browser.start();
 })();
+
+function query_handler(func){
+    return function(resp){
+        var str = '';
+        resp.on('data', function(chunk){
+            str += chunk;
+        });
+        resp.on('end', function(){
+            try{
+                func(str);
+            }catch(ex){
+                console.log('Exception processing query response [[' + ex + ']]');
+            }
+        });
+    };
+}
 

@@ -4,25 +4,28 @@ var mdns    = require('mdns'),
     util    = require('./util.js'),
        _    = require('underscore')._;
 
-var parser = new getopt.BasicParser('n:(name)h(help)', process.argv);
-var option;
-var config = {};
+var vm = {};
 
-function usage(){
-    console.log('Options: --name <name>');
-    process.exit(1);
-}
+(function(){
+    var parser = new getopt.BasicParser('n:(name)h(help)', process.argv);
+    var option;
 
-while ((option = parser.getopt()) !== undefined){
-    switch (option.option){
-        case 'h':
-            usage();
-            break;
-        case 'n':
-            config.name = option.optarg;
-            break;
+    function usage(){
+        console.log('Options: --name <name>');
+        process.exit(1);
     }
-}
+
+    while ((option = parser.getopt()) !== undefined){
+        switch (option.option){
+            case 'h':
+                usage();
+                break;
+            case 'n':
+                vm.name = option.optarg;
+                break;
+        }
+    }
+})();
 
 util.getNetworkIPs(
     function(err, ips){
@@ -37,7 +40,7 @@ util.getNetworkIPs(
             res.writeHead(200, {
                 'Content-Type': 'application/json'
             });
-            res.end(JSON.stringify(config));
+            res.end(JSON.stringify(vm));
         });
 
         webapp.listen(9301, function(){
