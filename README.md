@@ -28,6 +28,29 @@ $ curl http://localhost:9300/ -o - 2&gt;/dev/null | python -mjson.tool
 }
 </pre>
 
+## Installation
+
+<pre>
+git clone git://github.com/jlabusch/vm-announce.git
+cd vm-announce
+make dep
+# Either
+sudo make client-install
+# Or
+sudo make server-install
+</pre>
+
+On the client side there's a simple upstart job supplied that'll run `client.js` on boot.
+
+The server has an equivalent script for `server.js` plus a shell script called `vms`
+that wraps `tool.js` to provide easy access to the IP addresses of the running VMs.
+Usage:
+<pre>
+$ vms
+10.1.1.6 10.1.1.7 10.1.1.8
+$ cssh $(vms)
+</pre>
+
 ## Dependencies
 
 libavahi-compat-libdnssd-dev
