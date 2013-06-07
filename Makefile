@@ -9,5 +9,5 @@ clean:
 	rm -fr node_modules *.log
 
 install: upstart.conf
-	sed 's!PLACE!'$$PWD'!' $< | sed 's/HOST/'$$HOSTNAME'/' > vm-announce.conf
+	sed 's!PLACE!'$$PWD'!' $< | sed 's/HOST/$(shell /bin/hostname)/' > vm-announce.conf
 	install -m 644 -o root vm-announce.conf /etc/init/
