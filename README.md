@@ -13,7 +13,7 @@ Starts a zeroconf server listening for providers of `vm.tcp`.
 
 > `node ./client.js --name zazz --desc "Ubuntu 12.04.2 LTS"`
 
-Starts a zeroconf client that registers a VM with the name Fred.
+Starts a zeroconf client that registers a VM with the name `zazz`.
 The Answer section of the client's mDNS broadcast will look something like
 
 > `_vm._tcp.local: type PTR, class IN, ["10.1.1.6"]._vm._tcp.local`
