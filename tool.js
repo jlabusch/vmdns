@@ -39,6 +39,8 @@ while ((option = parser.getopt()) !== undefined){
     }
 }
 
+var filter = process.argv.slice(parser.optind());
+
 http.get(
     {host: config.server, port: config.port, path: '/'},
     util.query_handler(
@@ -49,6 +51,10 @@ http.get(
             function visit_peer(p){
                 _.each(p, function(attrs, ip){
                     if (util.is_ip(ip)){
+                        if (filter.length && _.contains(filter, attrs.name) == false){
+                            // skip
+                            return;
+                        }
                         ips.push(ip);
                         meta.push(
                             _.reduce(
