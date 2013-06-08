@@ -1,6 +1,6 @@
 
 exports.is_ip = function(x){
-    return x.match(/^\d+\.\d+\.\d+\.\d+$/);
+    return x && x.match(/^\d+\.\d+\.\d+\.\d+$/) !== null;
 }
 
 exports.query_handler = function(func){

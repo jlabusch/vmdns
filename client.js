@@ -1,9 +1,47 @@
 var mdns    = require('mdns'),
     express = require('express'),
     getopt  = require('posix-getopt'),
-       _    = require('underscore')._;
+    fs      = require('fs'),
+    _       = require('underscore')._;
 
 var vm = {};
+
+function fix(n){
+    return n.toFixed(2);
+}
+
+function update_stats(){
+    fs.readFile('/proc/loadavg', 'utf8', function(err, loadavg){
+        if (err){
+            console.log("Can't read /proc/loadavg [[" + err + "]]");
+        }else{
+            var parts = loadavg.split(/ /);
+            vm.loadavg = parts[0] + ' ' + parts[1] + ' ' + parts[2];
+        }
+        fs.readFile('/proc/uptime', 'utf8', function(err, uptime){
+            if (err){
+                console.log("Can't read /proc/uptime [[" + err + ']]');
+            }else{
+                var sec = parseInt(uptime);
+                if (isNaN(sec)){
+                    console.log("Couldn't parse /proc/uptime");
+                }else{
+                    if (sec < 100){
+                        vm.uptime = sec + ' sec';
+                    }else if (sec < (60*72)){
+                        vm.uptime = fix(sec/60) + ' min';
+                    }else if (sec < (60*60*25)){
+                        vm.uptime = fix(sec/(60*60)) + ' hours';
+                    }else{
+                        vm.uptime = fix(sec/(60*60*24)) + ' days';
+                    }
+                }
+            }
+        });
+    });
+}
+
+setInterval(update_stats, 60*1000);
 
 (function(){
     var parser = new getopt.BasicParser('n:(name)d:(desc)h(help)', process.argv);

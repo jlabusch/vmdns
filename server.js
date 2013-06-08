@@ -37,39 +37,6 @@ var vms = {
             vms.peers[p] = {};
         });
     }
-
-    function poll_peers(){
-        //console.log(JSON.stringify(vms));
-        // These GETs happen in parallel
-        _.each(vms.peers, function(vmlist, peer){
-            //console.log('checking peer: ' + peer);
-            var parts = peer.split(/:/);
-            http.get(
-                {
-                    host: parts[0],
-                    port: parts.length > 1 ? parts[1] : 9300,
-                    path: '/'
-                },
-                util.query_handler(
-                    function(s){
-                        var p = JSON.parse(s);
-                        var v = {};
-                        _.each(p, function(val, key){
-                            if (util.is_ip(key)){
-                                v[key] = val;
-                            }
-                        });
-                        vms.peers[peer] = v;
-                    }
-                )
-            ).on('error', function(e){
-                console.log('Error querying peer ' + peer + ' [[' + e.message + ']]');
-            });
-        });
-        setTimeout(poll_peers, 6*1000);
-    };
-
-    setTimeout(poll_peers, 0);
 })();
 
 // HTTP server
@@ -109,6 +76,12 @@ var vms = {
         return arr;
     }
 
+    function vm_loader(key){
+        return function(j){
+            _.extend(vms[key], JSON.parse(j));
+        };
+    }
+
     function add_vm(s){
         var ips = unwrap_mdns_name(s);
         if (ips){
@@ -116,11 +89,7 @@ var vms = {
             console.log('add: ' + ips[0]);
             http.get(
                 {host: ips[0], port: 9301, path: '/'},
-                util.query_handler(
-                    function(s){
-                        _.extend(vms[ips[0]], JSON.parse(s));
-                    }
-                )
+                util.query_handler(vm_loader(ips[0]))
             ).on('error', function(e){
                 console.log('Error querying metadata from http://' + ips[0] + ':9301 [[' + e.message + ']]');
             });
@@ -130,10 +99,82 @@ var vms = {
     function rm_vm(s){
         var ips = unwrap_mdns_name(s);
         if (ips){
-            vms[ips[0]] = undefined;
             console.log('rm: ' + ips[0]);
+            delete vms[ips[0]];
         }
     }
+
+    function poll_vms(vk){
+        if (vk === undefined){
+            vk = _.keys(vms);
+        }
+        if (vk.length < 1){
+            poll_peers();
+            return;
+        }
+        var ip = vk.shift();
+        if (util.is_ip(ip) === false){
+            poll_vms(vk);
+            return;
+        }
+        var loadvm = vm_loader(ip);
+        http.get(
+            {host: ip, port: 9301, path: '/'},
+            util.query_handler(function(j){
+                loadvm(j);
+                poll_vms(vk);
+            })
+        ).on('error', function(e){
+            console.log('Error querying metadata from http://' + ip + ':9301 [[' + e.message + ']]');
+            poll_vms(vk);
+        });
+    }
+
+    function poll_peers(pk){
+        if (pk === undefined){
+            pk = _.keys(vms.peers);
+        }
+        if (pk.length < 1){
+            setTimeout(poll_vms, 60*1000);
+            return;
+        }
+        var peer = pk.shift();
+        if (!peer){
+            poll_peers(pk);
+            return;
+        }
+        var parts = peer.split(/:/);
+        if (util.is_ip(parts[0]) === false){
+            console.log('Skipping peer "' + peer + '"');
+            poll_peers(pk);
+            return;
+        }
+        http.get(
+            {
+                host: parts[0],
+                port: parts.lenth > 1 ? parts[1] : 9300,
+                path: '/'
+            },
+            util.query_handler(
+                function(s){
+                    var p = JSON.parse(s);
+                    var v = {};
+                    _.each(p, function(val, key){
+                        if (util.is_ip(key)){
+                            v[key] = val;
+                        }
+                    });
+                    vms.peers[peer] = v;
+                    poll_peers(pk);
+                }
+            )
+        ).on('error', function(e){
+            console.log('Error querying peer ' + peer + ' [[' + e.message + ']]');
+            poll_peers(pk);
+        });
+    }
+
+    setTimeout(poll_vms, 2*1000);
 
     var browser = mdns.createBrowser(mdns.tcp('vm'), {resolverSequence: []});
 
@@ -143,7 +184,7 @@ var vms = {
     browser.on(
         'error',
         function(e){
-            console.log('error: ' + JSON.stringify(e));
+            console.log('mDNS browser error: ' + JSON.stringify(e));
         }
     );
 
