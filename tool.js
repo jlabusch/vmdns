@@ -13,7 +13,7 @@ var parser = new getopt.BasicParser('l(list)s:(server)h(help)', process.argv);
 var option;
 
 function usage(){
-    console.log('Options: [--list] [--server <host[:port]>]');
+    console.log('Options: [--list] [--server <host[:port]>] [vm-names...]');
     process.exit(1);
 }
 
