@@ -7,11 +7,11 @@ I have many VMs that move around between hosts and even between networks. I can'
 
 > `node ./server.js`
 
-Starts a zeroconf server listening for providers of `_vm._tcp.local`.
+Starts a zeroconf server listening for providers of `vm.tcp`.
 
 ## Client
 
-> `node ./client.js --name Fred --desc "Ubuntu 12.04 compat. testbed"`
+> `node ./client.js --name zazz --desc "Ubuntu 12.04.2 LTS"`
 
 Starts a zeroconf client that registers a VM with the name Fred.
 The Answer section of the client's mDNS broadcast will look something like
