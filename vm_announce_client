@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+import json
+import re
+
+import subprocess;
+
+ips = re.findall(r'inet (\d+\.\d+\.\d+\.\d+)', subprocess.getoutput("/sbin/ip addr"))
+if ips is None:
+    print("Couldn't determine local IP address(es)")
+    ips = []
+
+vm = { "name": "stink" }
+
+class QueryHandler(SimpleHTTPRequestHandler):
+    """Handles an HTTP GET, responding with a JSON dump of this host's metadata"""
+    def do_GET(r):
+        "Return this VM's details"
+        r.send_response(200)
+        r.send_header("Content-Type", "application/json")
+        r.end_headers()
+        r.wfile.write(json.dumps(vm).encode())
+
+def webapp():
+    """Starts an HTTP server on localhost:9301"""
+    httpd = HTTPServer(('localhost', 9301), QueryHandler)
+    print("This vm-announce client can be queried over HTTP on port 9301")
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    httpd.server_close()
+
+if __name__ == "__main__":
+    webapp()
+    print ("test")
