@@ -90,6 +90,6 @@ http.get(
         }
     )
 ).on('error', function(e){
-    console.log('Error querying ' + server + ' [[' + e.message + ']]');
+    console.log('Error querying ' + config.server + ' [[' + e.message + ']]');
 });
 
