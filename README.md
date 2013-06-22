@@ -18,7 +18,7 @@ The Answer section of the client's mDNS broadcast will look something like
 
 > `_vm._tcp.local: type PTR, class IN, ["10.1.1.6"]._vm._tcp.local`
 
-The "name" returned is a JSON array of the VM's IP addresses. Only tested with IPv4 at this point.
+The "name" returned is a JSON array of the VM's IP addresses. Only tested with IPv4 at this point. Yes, returning the IP this way is a massive ugly hack... But until I can figure out how to pull the A record out of the Answer section using `node_mdns`, welp...
 
 ## Data exchange
 
