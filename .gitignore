@@ -1,5 +1,5 @@
 node_modules
+build
 .*.swp
 vms
-vm-announce-server.conf
-vm-announce-client.conf
+vm-announce.conf
