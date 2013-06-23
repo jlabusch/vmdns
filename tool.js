@@ -79,43 +79,6 @@ http.get(
             }else{
                 console.log(ips.join(' '));
             }
-            /*
-            function visit_peer(p){
-                _.each(p, function(attrs, ip){
-                    if (util.is_ip(ip)){
-                        if (filter.length && _.contains(filter, attrs.name) == false){
-                            // skip
-                            return;
-                        }
-                        ips.push(ip);
-                        meta.push(
-                            _.reduce(
-                                attrs,
-                                function(memo, val, key){
-                                    if (memo.length){
-                                        memo += ', ';
-                                    }
-                                    return memo + key + '=' + val;
-                                },
-                                ''
-                            )
-                        );
-                    }
-                });
-            }
-            //visit_peer(vms);
-            console.log(JSON.stringify(vms));
-            if (config.list){
-                _.each(
-                    _.zip(ips, meta),
-                    function(val){
-                        console.log(val[0] + ': ' + val[1]);
-                    }
-                );
-            }else{
-                console.log(ips.join(' '));
-            }
-            */
         }
     )
 ).on('error', function(e){
