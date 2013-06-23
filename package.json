@@ -1,6 +1,6 @@
 {
   "name": "vm-announce",
-  "version": "0.0.1",
+  "version": "0.4.0",
   "description": "mDNS exchange for small dynamic VM farms",
   "main": "peer.js",
   "private": true,

@@ -3,56 +3,13 @@
 I have many VMs that move around between hosts and even between networks. I can't keep track of them!
 (Well I can, but it's harder than it should be.)
 
-## Server
+This tool makes it easy by using multicast DNS to broadcast IP address changes for the `vm` service.
 
-> `node ./server.js`
+## Usage
 
-Starts a zeroconf server listening for providers of `vm.tcp`.
+In this version the client and server modules have been merged. Everyone runs a browser and everyone advertises their own IP address. <em>(Caveats - only one address, and it must be IPv4.)</em>
 
-## Client
-
-> `node ./client.js --name zazz --desc "Ubuntu 12.04.2 LTS"`
-
-Starts a zeroconf client that registers a VM with the name `zazz`.
-The Answer section of the client's mDNS broadcast will look something like
-
-> `_vm._tcp.local: type PTR, class IN, ["10.1.1.6"]._vm._tcp.local`
-
-The "name" returned is a JSON array of the VM's IP addresses. Only tested with IPv4 at this point. Yes, returning the IP this way is a massive ugly hack... But until I can figure out how to pull the A record out of the Answer section using `node_mdns`, welp...
-
-## Data exchange
-
-Once a server has seen a client's advertisement it will try to get additional metadata using the first IP address in its name array (10.1.1.6 above).
-
-> `HTTP GET 10.1.1.6:9301/`
-
-The client responds with a JSON dump of its metadata. You can query it yourself at any time:
-
-<pre>
-    $ curl -s http://10.1.1.6:9301 -o - | python -mjson.tool
-    {
-        "desc": "Ubuntu 12.04.2 LTS",
-        "loadavg": "0.00 0.01 0.05",
-        "name": "zazz",
-        "uptime": "19.65 min"
-    }
-</pre>
-
-The data includes
-
-  * <b>name</b>: defaults to `$HOSTNAME`.
-  * <b>desc</b>: optional description of the VM's purpose. Default's to `lsb_release --description`
-  * <b>loadavg</b>: updated every minute from `/proc/loadavg`. <em>[TODO - non-Linux client support]</em>
-  * <b>uptime</b>: updated every minute from `/proc/uptime`. <em>[TODO - non-Linux client support]</em>
-
-## Tools
-
-Server installation includes a script called `vms` that wraps `tool.js` and gives you a way to query the data that the server has collected.
-
-<pre>
-    $ vms -l
-    10.1.1.6: name=zazz, desc=Ubuntu 12.04.2 LTS, loadavg=0.11 0.20 0.14, uptime=33.65 min
-</pre>
+The `vms` script wraps `tool.js` and gives you a way to query the data that the server has collected.
 
 The most interesting use cases are:
 
@@ -67,22 +24,19 @@ The most interesting use cases are:
 ## Installation
 
 <pre>
-git clone git://github.com/jlabusch/vm-announce.git
-cd vm-announce
-make dep
-# Either
-sudo make client-install
-# Or
-sudo make server-install
+    $ git clone git://github.com/jlabusch/vm-announce.git
+    $ cd vm-announce
+    $ make dep vms vm-announce.conf
+    $ sudo make install
 </pre>
 
-On the client side there's a simple upstart job supplied that'll run `client.js` on boot.
-
-The server has an equivalent script for `server.js`.
+Installation includes a simple upstart job supplied that'll run `vm-announce.js` on boot. <em>(TODO - modify it to stop on network-down.)</em>
 
 ## Notes
 
-Depends on libavahi-compat-libdnssd-dev.
+  * Only tested on Linux.
+  * Address resolution depends on Avahi.
+  * `node-mdns` depends on libavahi-compat-libdnssd-dev.
 
 Installation is fit for <em>my</em> purposes right now, but might not be for yours: it keeps using the JS files in the source directory you installed from, which is great for development but maybe surprising for more normal installations.
 
