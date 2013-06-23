@@ -1,7 +1,10 @@
 {
   "name": "vm-announce",
   "version": "0.0.1",
+  "description": "mDNS exchange for small dynamic VM farms",
+  "main": "peer.js",
   "private": true,
+  "gypfile": true,
   "dependencies": {
     "should": ">= 1.2.2",
     "mocha": ">= 1.8.2",

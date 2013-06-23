@@ -1,0 +1,9 @@
+description "vm-announce mDNS exchange"
+author "Jacques Labuschagne <jlabusch@acm.org>"
+
+start on (local-filesystems and net-device-up IFACE!=lo)
+stop on runlevel [016]
+
+respawn
+
+exec /usr/bin/node PLACE/vm-announce.js
