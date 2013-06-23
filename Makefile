@@ -5,16 +5,13 @@ dep: package.json
 	npm install -d
 	patch -p0 < mdns.patch
 	/usr/lib/node_modules/npm/bin/node-gyp-bin/node-gyp configure
-
-avahi_resolver: src/avahi_resolver.cpp
 	/usr/lib/node_modules/npm/bin/node-gyp-bin/node-gyp build
 
 tidy:
 	rm -fr *.log vms vm-announce-client.conf vm-announce-server.conf
 
 clean: tidy
-	rm -fr node_modules
-	build
+	rm -fr node_modules build
 
 vm-announce.conf: vm-announce.template
 	sed 's!PLACE!'$$PWD'!' $< | sed 's/HOST/$(shell /bin/hostname)/' > $@

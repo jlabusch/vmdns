@@ -32,9 +32,9 @@ function add_vm(obj){
     //console.log('VMs: ' + JSON.stringify(vms));
 }
 
-function rm_vm(name){
-    console.log(name + ' => {deleted}');
-    delete vms[name];
+function rm_vm(obj){
+    console.log(obj.name + ' => {deleted}');
+    delete vms[obj.name];
     //console.log('VMs: ' + JSON.stringify(vms));
 }
 
