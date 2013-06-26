@@ -56,18 +56,16 @@ http.get(
                 }
                 names.push(vm);
                 ips.push(attrs.addr || 'addr-unknown');
-                meta.push(
-                    _.reduce(
-                        attrs,
-                        function(memo, val, key){
-                            if (memo.length){
-                                memo += ', ';
-                            }
-                            return memo + key + '=' + val;
-                        },
-                        ''
-                    )
-                );
+                var summary = '';
+                ['addr', 'uptime', 'loadavg'].forEach(function(k){
+                    if (attrs[k]){
+                        if (summary.length){
+                            summary += ', ';
+                        }
+                        summary += k + ' ' + attrs[k];
+                    }
+                });
+                meta.push(summary);
             });
             if (config.list){
                 _.each(
