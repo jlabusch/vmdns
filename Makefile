@@ -8,7 +8,7 @@ dep: package.json
 	/usr/lib/node_modules/npm/bin/node-gyp-bin/node-gyp build
 
 tidy:
-	rm -fr *.log vms vm-announce-client.conf vm-announce-server.conf
+	rm -fr *.log vms vm-announce.conf
 
 clean: tidy
 	rm -fr node_modules build

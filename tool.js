@@ -71,7 +71,7 @@ http.get(
                 _.each(
                     _.zip(names, meta),
                     function(val){
-                        console.log(val[0] + ': ' + val[1]);
+                        console.log(val[0] + ':\t' + val[1]);
                     }
                 );
             }else{

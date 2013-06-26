@@ -14,10 +14,15 @@ The `vms` script wraps `tool.js` and gives you a way to query the data that the 
 The most interesting use cases are:
 
 <pre>
+    # List VMs
+    $ vms -l
+    Bob:	addr 10.1.1.10, uptime 5.88 min, loadavg 0.13 0.17 0.08
+    Fred:	addr 10.1.1.7, uptime 11.05 min, loadavg 0.14 0.33 0.29
+
     # Open shells on all VMs
     $ cssh $(vms)
-    
-    # Connect to the VMs named Bob and Fred
+
+    # Connect to only the VMs named Bob and Fred
     $ cssh $(vms Bob Fred)
 </pre>
 
