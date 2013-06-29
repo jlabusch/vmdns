@@ -18,6 +18,7 @@ install: vmdns vmdns.conf
 	mkdir -p /usr/local/lib/vmdns
 	rsync -a --exclude .git . /usr/local/lib/vmdns/
 	ln -s /usr/local/lib/vmdns/vmdns /usr/local/bin/
+	service vmdns start
 
 uninstall:
 	service vmdns stop || :
