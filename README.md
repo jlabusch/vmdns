@@ -31,7 +31,7 @@ The most interesting use cases are:
 <pre>
     $ git clone git://github.com/jlabusch/vm-announce.git
     $ cd vm-announce
-    $ make dep vms vm-announce.conf
+    $ make all 
     $ sudo make install
 </pre>
 
@@ -42,8 +42,6 @@ Installation includes a simple upstart job supplied that'll run `vm-announce.js`
   * Only tested on Linux.
   * Address resolution depends on Avahi.
   * `node-mdns` depends on libavahi-compat-libdnssd-dev.
-
-Installation is fit for <em>my</em> purposes right now, but might not be for yours: it keeps using the JS files in the source directory you installed from, which is great for development but maybe surprising for more normal installations.
 
 ## License
 
