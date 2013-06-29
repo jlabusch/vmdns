@@ -1,27 +1,47 @@
-# What teh
+# vmdns
 
-I have many VMs that move around between hosts and even between networks. I can't keep track of them!
-(Well I can, but it's harder than it should be.)
+> Dynamic DNS for fluid local area networks.
 
-This tool makes it easy by using multicast DNS to broadcast IP address changes for the `vm` service.
+## Use cases
 
-## Usage
+List `vmdns` peers
+<pre>
+    $ vmdns -l
+    hector:	addr 10.1.1.7, uptime 1.33 days, loadavg 0.03 0.04 0.05
+    stonk:	addr 10.1.1.10, uptime 1.33 days, loadavg 0.01 0.06 0.11
+</pre>
 
-TODO.
+Open shells on all peers
+<pre>
+    $ cssh $(vmdns)
+</pre>
 
-The most interesting use cases are:
+`vmdns` keeps `/etc/hosts` up to date, so you can access a peer
+using `<hostname>` or `<hostname>.local`
+<pre>
+    $ grep hector /etc/hosts
+    10.1.1.7	hector.local hector # Added by vmdns
+    $ ssh hector
+</pre>
+
+## How it works
+
+### The service
+
+`/etc/init/vmdns.conf` runs `vmdns --server` on boot.
+
+The server advertises the local host as a vmdns peer as well as using mDNS to
+browse for other peers.
+
+Peers it discovers are added to `/etc/hosts` and periodically queried for uptime/load information. (`GET http://<peer>:9300/stats`)
+
+### The utility
+
+Running `vmdns` by hand will query a vmdns server, listing its peers in short or long form.
 
 <pre>
-    # List VMs
-    $ vmdns -l
-    Bob:	addr 10.1.1.10, uptime 5.88 min, loadavg 0.13 0.17 0.08
-    Fred:	addr 10.1.1.7, uptime 11.05 min, loadavg 0.14 0.33 0.29
-
-    # Open shells on all VMs
-    $ cssh $(vmdns)
-
-    # Connect to only the VMs named Bob and Fred
-    $ cssh $(vmdns Bob Fred)
+    $ vmdns -h
+    Query:  vmdns [--list] [--connect-to <host[:port]>] [vm-names...]
 </pre>
 
 ## Installation
@@ -32,8 +52,6 @@ The most interesting use cases are:
     $ make all 
     $ sudo make install
 </pre>
-
-Installation includes a simple upstart job supplied that'll run `vmdns --server` on boot.
 
 ## Notes
 
