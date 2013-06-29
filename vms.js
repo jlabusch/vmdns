@@ -43,9 +43,6 @@ exports.update = function(key, newdata){
 var HOSTS = '/etc/hosts';
 
 function sync_to_hosts_file(and_then){
-    // TODO:
-    // Attempt to clean up hosts file by deleting entries with "Added by vmdns"
-    // comment that don't exist in vms any more
     and_then = and_then || function(){};
     var hostmap = {};
     _.each(vms, function(attrs){
