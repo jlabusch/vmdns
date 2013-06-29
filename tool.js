@@ -1,85 +1,55 @@
 var http    = require('http'),
-    getopt  = require('posix-getopt'),
     util    = require('./util.js'),
     _       = require('underscore')._;
 
-var config = {
-    list: false,
-    server: 'localhost',
-    port: 9300
-};
+module.exports = (function(){
+    var config = {};
 
-var parser = new getopt.BasicParser('l(list)s:(server)h(help)', process.argv);
-var option;
-
-function usage(){
-    console.log('Options: [--list] [--server <host[:port]>] [vm-names...]');
-    process.exit(1);
-}
-
-while ((option = parser.getopt()) !== undefined){
-    switch (option.option){
-        case 'h':
-            usage();
-            break;
-        case 's':
-            config.server = option.optarg;
-            var parts = config.server.split(/:/);
-            if (parts > 1){
-                config.server = parts[0];
-                config.port = parseInt(parts[1]);
-                if (isNaN(config.port)){
-                    usage();
-                }
+    function show_vms(raw){
+        var js  = JSON.parse(raw),
+            ips  = [],
+            names= [],
+            meta = [];
+        _.each(js, function(attrs, vm){
+            if (config.filter.length && _.contains(config.filter, attrs.name) == false){
+                // skip
+                return;
             }
-            break;
-        case 'l':
-            config.list = true;
-            break;
-    }
-}
-
-var filter = process.argv.slice(parser.optind());
-
-http.get(
-    {host: config.server, port: config.port, path: '/'},
-    util.query_handler(
-        function(s){
-            var vms  = JSON.parse(s),
-                ips  = [],
-                names= [],
-                meta = [];
-            _.each(vms, function(attrs, vm){
-                if (filter.length && _.contains(filter, attrs.name) == false){
-                    // skip
-                    return;
-                }
-                names.push(vm);
-                ips.push(attrs.addr || 'addr-unknown');
-                var summary = '';
-                ['addr', 'uptime', 'loadavg'].forEach(function(k){
-                    if (attrs[k]){
-                        if (summary.length){
-                            summary += ', ';
-                        }
-                        summary += k + ' ' + attrs[k];
+            names.push(vm);
+            ips.push(attrs.addr || 'addr-unknown');
+            var summary = '';
+            ['addr', 'uptime', 'loadavg'].forEach(function(k){
+                if (attrs[k]){
+                    if (summary.length){
+                        summary += ', ';
                     }
-                });
-                meta.push(summary);
+                    summary += k + ' ' + attrs[k];
+                }
             });
-            if (config.list){
-                _.each(
-                    _.zip(names, meta),
-                    function(val){
-                        console.log(val[0] + ':\t' + val[1]);
-                    }
-                );
-            }else{
-                console.log(ips.join(' '));
-            }
+            meta.push(summary);
+        });
+        if (config.mode === 'long'){
+            _.each(
+                _.zip(names, meta),
+                function(val){
+                    console.log(val[0] + ':\t' + val[1]);
+                }
+            );
+        }else{
+            console.log(ips.join(' '));
         }
-    )
-).on('error', function(e){
-    console.log('Error querying ' + config.server + ' [[' + e.message + ']]');
-});
+    }
+
+    return {
+        query: function(c){
+            config = c;
+            http.get(
+                {host: config.host, port: config.port, path: '/'},
+                util.query_handler(show_vms)
+            ).on('error', function(e){
+                console.log('Error querying ' + config.host + ' [[' + e.message + ']]');
+            });
+        }
+    };
+})();
 

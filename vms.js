@@ -14,6 +14,10 @@ var vms = {};
 
 exports.data = vms;
 
+exports.update = function(key, newdata){
+    vms[key] = _.extend(vms[key], newdata);
+};
+
 exports.add = function(obj){
     try{
         if (obj.host){

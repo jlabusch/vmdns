@@ -72,7 +72,7 @@ function stat_updater(key){
         if (err){
             console.log(err);
         }else{
-            vms.data[key] = _.extend(vms.data[key], stats);
+            vms.update(key, stats);
         }
     };
 }

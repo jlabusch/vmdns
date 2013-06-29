@@ -1,54 +1,63 @@
-var mdns    = require('mdns'),
-    express = require('express'),
-    util    = require('./util.js'),
-    vms     = require('./vms.js'),
-    stats   = require('./stats.js'),
+#!/usr/bin/env node
+
+var http    = require('http'),
+    getopt  = require('posix-getopt'),
+    tool    = require('./tool.js'),
     _       = require('underscore')._;
 
-stats.run();
+var config = {
+    mode: 'short',      // short, long, server
+    host: 'localhost',  // ignored for mode=server
+    filter: [],         // ignored for mode=server
+    port: 9300
+};
 
-// mDNS browser
 (function(){
-    var browser = mdns.createBrowser(mdns.tcp('vm'), {resolverSequence: [mdns.rst.DNSServiceResolve()]});
+    var parser = new getopt.BasicParser('l(list)s(server)c:(connect-to)h(help)', process.argv);
+    var option;
 
-    browser.on('serviceUp', vms.add);
-    browser.on('serviceChanged', vms.add);
-    browser.on('serviceDown', vms.rm);
-    browser.on('error', function(e){ console.log('Error: ' + JSON.stringify(e)); });
+    function usage(){
+        console.log('Query:  vmdns [--list] [--connect-to <host[:port]>] [vm-names...]');
+        console.log('Server: vmdns --server');
+        process.exit(1);
+    }
 
-    browser.start();
+    while ((option = parser.getopt()) !== undefined){
+        switch (option.option){
+            case 'h':
+                usage();
+                break;
+            case 's':
+                config.mode = 'server';
+                break;
+            case 'c':
+                config.host = option.optarg;
+                var parts = config.host.split(/:/);
+                if (parts > 1){
+                    config.host = parts[0];
+                    config.port = parseInt(parts[1]);
+                    if (isNaN(config.port)){
+                        usage();
+                    }
+                }
+                break;
+            case 'l':
+                config.mode = 'long';
+                break;
+        }
+    }
+
+    config.filter = process.argv.slice(parser.optind());
 })();
 
-// mDNS client
-(function(){
-    var ad = mdns.createAdvertisement(
-        mdns.tcp('vm'),
-        9300
-    );
+if (config.mode === 'server'){
+    var stats   = require('./stats.js'),
+        websvc  = require('./websvc.js'),
+        mdns    = require('./zeroconf.js');
+    stats.run();
+    websvc.run();
+    mdns.run();
+}else{
+    tool.query(config);
+}
 
-    ad.start();
-})();
-
-// HTTP server
-(function(){
-    var CRLF = '\r\n';
-
-    var webapp  = express();
-
-    webapp.get('/', function(req, res){
-        res.writeHead(200, {
-            'Content-Type': 'application/json'
-        });
-        res.end(JSON.stringify(vms.data) + CRLF);
-    });
-    webapp.get('/stats', function(req, res){
-        res.writeHead(200, {
-            'Content-Type': 'application/json'
-        });
-        res.end(JSON.stringify(stats.me()) + CRLF);
-    });
-
-    webapp.listen(9300, function(){
-        console.log('This vm-announce server can be queried over HTTP on port 9300');
-    });
-})();
