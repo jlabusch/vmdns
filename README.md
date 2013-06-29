@@ -7,35 +7,33 @@ This tool makes it easy by using multicast DNS to broadcast IP address changes f
 
 ## Usage
 
-In this version the client and server modules have been merged. Everyone runs a browser and everyone advertises their own IP address. <em>(Caveats - only one address, and it must be IPv4.)</em>
-
-The `vms` script wraps `tool.js` and gives you a way to query the data that the server has collected.
+TODO.
 
 The most interesting use cases are:
 
 <pre>
     # List VMs
-    $ vms -l
+    $ vmdns -l
     Bob:	addr 10.1.1.10, uptime 5.88 min, loadavg 0.13 0.17 0.08
     Fred:	addr 10.1.1.7, uptime 11.05 min, loadavg 0.14 0.33 0.29
 
     # Open shells on all VMs
-    $ cssh $(vms)
+    $ cssh $(vmdns)
 
     # Connect to only the VMs named Bob and Fred
-    $ cssh $(vms Bob Fred)
+    $ cssh $(vmdns Bob Fred)
 </pre>
 
 ## Installation
 
 <pre>
     $ git clone git://github.com/jlabusch/vm-announce.git
-    $ cd vm-announce
+    $ cd vmdns
     $ make all 
     $ sudo make install
 </pre>
 
-Installation includes a simple upstart job supplied that'll run `vm-announce.js` on boot. <em>(TODO - modify it to stop on network-down.)</em>
+Installation includes a simple upstart job supplied that'll run `vmdns --server` on boot.
 
 ## Notes
 
