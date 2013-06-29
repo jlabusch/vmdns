@@ -47,7 +47,7 @@ Running `vmdns` by hand will query a vmdns server, listing its peers in short or
 ## Installation
 
 <pre>
-    $ git clone git://github.com/jlabusch/vm-announce.git
+    $ git clone git://github.com/jlabusch/vmdns.git
     $ cd vmdns
     $ make all 
     $ sudo make install
