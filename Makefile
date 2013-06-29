@@ -8,7 +8,7 @@ all: package.json
 	/usr/lib/node_modules/npm/bin/node-gyp-bin/node-gyp build
 
 tidy:
-	rm -fr *.log *.conf
+	rm -fr *.log
 
 clean: tidy
 	rm -fr node_modules build
