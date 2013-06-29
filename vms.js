@@ -122,7 +122,7 @@ exports.add = function(obj){
                 }else{
                     console.log('Host ' + obj.name + ' has no port specified');
                 }
-                setTimeout(unlocker(obj.host), LOCK_TIMEOUT);
+                sync_to_hosts_file(function(){ setTimeout(unlocker(obj.host, lid), LOCK_TIMEOUT); });
             });
         }else{
             console.log(obj.name + ' => {unknown}');
